@@ -2,6 +2,7 @@ package com.e_notes.service.impl;
 
 import com.e_notes.dto.CategoryDto;
 import com.e_notes.dto.CategoryResponse;
+import com.e_notes.exception.ResourceNotFoundException;
 import com.e_notes.model.Category;
 import com.e_notes.repository.CategoryRepository;
 import com.e_notes.service.CategoryService;
@@ -57,38 +58,40 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(Long id) {
-        Optional<Category> optionalCategory = categoryRepository.findById(id);
-        if (optionalCategory.isEmpty()) {
-            return null;
+        Category optionalCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("category not found id:" + id));
+
+        if (Boolean.TRUE.equals(optionalCategory.getIsDeleted())) {
+            throw new ResourceNotFoundException("category not found with id:" + optionalCategory.getId());
         }
-        Category category = optionalCategory.get();
-        if (Boolean.TRUE.equals(category.getIsDeleted())) {
-            return null;
-        }
-        return modelMapper.map(category, CategoryDto.class);
+        return modelMapper.map(optionalCategory, CategoryDto.class);
     }
 
     @Override
     public boolean deleteCategory(Long id) {
-        Optional<Category> optionalCategory = categoryRepository.findById(id);
-        if (optionalCategory.isEmpty()) {
-            return false;
+        Category optionalCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "category not found id" + id
+                ));
+        if (Boolean.TRUE.equals(optionalCategory.getIsDeleted())) {
+            throw new ResourceNotFoundException("Category already deleted with id: " + id);
         }
-        Category category = optionalCategory.get(); // Soft delete category.setIsDeleted(true); category.setIsActive(false); categoryRepository.save(category);
+        optionalCategory.setIsDeleted(true);
+        optionalCategory.setIsActive(false);
+        categoryRepository.save(optionalCategory);
         return true;
     }
 
     @Override
     public boolean updateCategory(CategoryDto categoryDto) {
 
-        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getId());
-        if (optionalCategory.isEmpty()) {
-            return false;
-        }
-        Category category = optionalCategory.get();
+        Category category = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "category not found with id:" + categoryDto.getId()
+                ));
         // Check soft deleted category
         if (Boolean.TRUE.equals(category.getIsDeleted())) {
-            return false;
+            throw new ResourceNotFoundException("category not found with id:" + categoryDto.getId());
         }
         modelMapper.map(categoryDto, category);
         category.setUpdatedBY(1);
