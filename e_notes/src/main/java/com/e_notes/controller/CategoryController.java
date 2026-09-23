@@ -3,6 +3,7 @@ package com.e_notes.controller;
 import com.e_notes.dto.CategoryDto;
 import com.e_notes.dto.CategoryResponse;
 import com.e_notes.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -21,7 +22,7 @@ public class CategoryController {
     }
 
     @PostMapping("/savecategory")
-    public ResponseEntity<?> saveCategory(@RequestBody CategoryDto categorydto) {
+    public ResponseEntity<?> saveCategory(@Valid @RequestBody CategoryDto categorydto) {
         boolean saved = categoryService.saveCategory(categorydto);
         if (saved) {
             return new ResponseEntity<>("saved success", HttpStatus.CREATED);
