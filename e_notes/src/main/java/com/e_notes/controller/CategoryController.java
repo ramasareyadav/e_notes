@@ -68,4 +68,13 @@ public class CategoryController {
         return new ResponseEntity<>("Category not found with id: " + id, HttpStatus.NOT_FOUND);
     }
 
+    @PutMapping
+    public ResponseEntity<String> updateCategory(@RequestBody CategoryDto categoryDto) {
+        boolean updated = categoryService.updateCategory(categoryDto);
+        if (updated) {
+            return new ResponseEntity<>("Category updated successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Category not found with id: " + categoryDto.getId(), HttpStatus.NOT_FOUND);
+
+    }
 }
