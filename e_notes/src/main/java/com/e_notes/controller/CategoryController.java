@@ -50,5 +50,22 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
+        CategoryDto categoryDto = categoryService.getCategoryById(id);
+        if (categoryDto == null) {
+            return new ResponseEntity<>("Category not found with id: " + id, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
+        boolean deleted = categoryService.deleteCategory(id);
+        if (deleted) {
+            return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Category not found with id: " + id, HttpStatus.NOT_FOUND);
+    }
 
 }

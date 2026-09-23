@@ -12,6 +12,7 @@ import org.springframework.util.ObjectUtils;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -52,5 +53,28 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryResponse> categoryList = categories.stream().map(category -> modelMapper.map(category, CategoryResponse.class))
                 .toList();
         return categoryList;
+    }
+
+    @Override
+    public CategoryDto getCategoryById(Long id) {
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        if (optionalCategory.isEmpty()) {
+            return null;
+        }
+        Category category = optionalCategory.get();
+        if (Boolean.TRUE.equals(category.getIsDeleted())) {
+            return null;
+        }
+        return modelMapper.map(category, CategoryDto.class);
+    }
+
+    @Override
+    public boolean deleteCategory(Long id) {
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        if (optionalCategory.isEmpty()) {
+            return false;
+        }
+        Category category = optionalCategory.get(); // Soft delete category.setIsDeleted(true); category.setIsActive(false); categoryRepository.save(category);
+        return true;
     }
 }
