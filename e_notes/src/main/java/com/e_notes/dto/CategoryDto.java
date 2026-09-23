@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
-   // private Long id;
+    private Long id;
     private String name;
     private String description;
     private Boolean isActive;
