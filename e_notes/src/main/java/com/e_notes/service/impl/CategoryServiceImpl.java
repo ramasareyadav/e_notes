@@ -77,4 +77,25 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = optionalCategory.get(); // Soft delete category.setIsDeleted(true); category.setIsActive(false); categoryRepository.save(category);
         return true;
     }
+
+    @Override
+    public boolean updateCategory(CategoryDto categoryDto) {
+
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryDto.getId());
+        if (optionalCategory.isEmpty()) {
+            return false;
+        }
+        Category category = optionalCategory.get();
+        // Check soft deleted category
+        if (Boolean.TRUE.equals(category.getIsDeleted())) {
+            return false;
+        }
+        modelMapper.map(categoryDto, category);
+        category.setUpdatedBY(1);
+        category.setCreatedOn(LocalDateTime.now());
+        // Save updated category
+        Category updateCategory = categoryRepository.save(category);
+        return !ObjectUtils.isEmpty(updateCategory);
+
+    }
 }
