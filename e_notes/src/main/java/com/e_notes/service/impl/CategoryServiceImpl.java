@@ -36,9 +36,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = modelMapper.map(categoryDto, Category.class);
         category.setIsDeleted(false);
-        category.setCreatedBy(1);
-        category.setCreatedOn(LocalDateTime.now());
-        Category saveCategory = categoryRepository.save(category);
+//        category.setCreatedBy(1);
+//        category.setCreatedOn(LocalDateTime.now());
+       Category saveCategory = categoryRepository.save(category);
         if (ObjectUtils.isEmpty(saveCategory)) {
             return false;
         }
@@ -99,8 +99,8 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ResourceNotFoundException("category not found with id:" + categoryDto.getId());
         }
         modelMapper.map(categoryDto, category);
-        category.setUpdatedBY(1);
-        category.setCreatedOn(LocalDateTime.now());
+//        category.setUpdatedBY(1);
+//        category.setCreatedOn(LocalDateTime.now());
         // Save updated category
         Category updateCategory = categoryRepository.save(category);
         return !ObjectUtils.isEmpty(updateCategory);
