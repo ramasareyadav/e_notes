@@ -1,13 +1,12 @@
-spring:
-  application :
-  name : e_notes
+  spring:
+    application:
+      name: e_notes
 
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/jpa_db
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    datasource:
+      url: jdbc:mysql://localhost:3306/jpa_db
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
 
     jpa:
       hibernate:
