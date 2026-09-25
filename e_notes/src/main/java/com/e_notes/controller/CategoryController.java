@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/v1/category")
 public class CategoryController {
@@ -22,7 +23,7 @@ public class CategoryController {
     }
 
     @PostMapping("/savecategory")
-    public ResponseEntity<?> saveCategory(@Valid @RequestBody CategoryDto categorydto) {
+    public ResponseEntity<?> saveCategory(@Valid @RequestBody CategoryDto categorydto){
         boolean saved = categoryService.saveCategory(categorydto);
         if (saved) {
             return new ResponseEntity<>("saved success", HttpStatus.CREATED);

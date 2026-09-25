@@ -2,6 +2,7 @@ package com.e_notes.service.impl;
 
 import com.e_notes.dto.CategoryDto;
 import com.e_notes.dto.CategoryResponse;
+import com.e_notes.exception.ExistDataException;
 import com.e_notes.exception.ResourceNotFoundException;
 import com.e_notes.model.Category;
 import com.e_notes.repository.CategoryRepository;
@@ -34,15 +35,21 @@ public class CategoryServiceImpl implements CategoryService {
 
         validation.categoryValidation(categoryDto);
 
-        Category category = modelMapper.map(categoryDto, Category.class);
-        category.setIsDeleted(false);
-//        category.setCreatedBy(1);
-//        category.setCreatedOn(LocalDateTime.now());
-       Category saveCategory = categoryRepository.save(category);
-        if (ObjectUtils.isEmpty(saveCategory)) {
-            return false;
+        boolean exists = categoryRepository.existsByName(categoryDto.getName().trim());
+
+        if (exists) {
+            throw new ExistDataException("Category already exists");
         }
-        return true;
+
+        Category category = modelMapper.map(categoryDto, Category.class);
+
+        category.setIsDeleted(false);
+        category.setCreatedBy(1);
+        category.setCreatedOn(LocalDateTime.now());
+
+        Category savedCategory = categoryRepository.save(category);
+
+        return !ObjectUtils.isEmpty(savedCategory);
     }
 
     @Override
@@ -90,6 +97,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public boolean updateCategory(CategoryDto categoryDto) {
 
+        validation.categoryValidation(categoryDto);
+
+
+
         Category category = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "category not found with id:" + categoryDto.getId()
@@ -98,6 +109,11 @@ public class CategoryServiceImpl implements CategoryService {
         if (Boolean.TRUE.equals(category.getIsDeleted())) {
             throw new ResourceNotFoundException("category not found with id:" + categoryDto.getId());
         }
+        boolean exists = categoryRepository.existsByName(categoryDto.getName().trim());
+
+        if (exists) {
+            throw new ExistDataException("Category already exists");
+        }
         modelMapper.map(categoryDto, category);
 //        category.setUpdatedBY(1);
 //        category.setCreatedOn(LocalDateTime.now());
@@ -105,5 +121,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category updateCategory = categoryRepository.save(category);
         return !ObjectUtils.isEmpty(updateCategory);
 
+    }
+
+    @Override
+    public List<CategoryDto> findByIsDeletedFalse() {
+        List<Category> categories = categoryRepository.findByIsDeletedFalse();
+        return categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDto.class))
+                .toList();
     }
 }

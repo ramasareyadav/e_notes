@@ -3,6 +3,7 @@ package com.e_notes.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -64,6 +65,30 @@ public class GlobalExceptionHandler {
         );
     }
 
+   /* @ExceptionHandler(ExistDataException.class)
+    public ResponseEntity<Map<String, String>> existDataException(
+            ExistDataException ex) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
+   */ //}
+
+    @ExceptionHandler(ExistDataException.class)
+    public ResponseEntity<Map<String, String>> existDataException(ExistDataException dataException) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of("message", dataException.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> existDataException(HttpMessageNotReadableException dataException) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", dataException.getMessage()));
+    }
+
+
     // Generic Exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(
@@ -79,6 +104,7 @@ public class GlobalExceptionHandler {
                 response,
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
+
     }
 }
 
