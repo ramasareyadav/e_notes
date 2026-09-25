@@ -5,6 +5,7 @@ import com.e_notes.dto.CategoryResponse;
 import com.e_notes.model.Category;
 
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 public interface CategoryService {
 
@@ -19,4 +20,6 @@ public interface CategoryService {
     boolean deleteCategory(Long id);
 
     boolean updateCategory(CategoryDto categoryDto);
+
+    List<CategoryDto> findByIsDeletedFalse();
 }
