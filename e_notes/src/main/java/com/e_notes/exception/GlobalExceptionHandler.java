@@ -1,6 +1,6 @@
-
 package com.e_notes.exception;
 
+import com.e_notes.util.CommonUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -8,7 +8,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -17,24 +16,19 @@ public class GlobalExceptionHandler {
 
     // Resource Not Found Exception
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFound(
+    public ResponseEntity<?> handleResourceNotFound(
             ResourceNotFoundException ex) {
 
-        ErrorResponse response = new ErrorResponse(
+        return CommonUtil.createErrorResponseMessage(
                 ex.getMessage(),
-                "NOT_FOUND",
-                LocalDateTime.now()
-        );
-
-        return new ResponseEntity<>(
-                response,
                 HttpStatus.NOT_FOUND
         );
     }
 
+
     // Bean Validation Exception
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(
+    public ResponseEntity<?> handleValidationException(
             MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new LinkedHashMap<>();
@@ -48,63 +42,56 @@ public class GlobalExceptionHandler {
                         )
                 );
 
-        return new ResponseEntity<>(
+        return CommonUtil.createErrorResponse(
                 errors,
                 HttpStatus.BAD_REQUEST
         );
     }
 
+
     // Custom Category Validation Exception
     @ExceptionHandler(CategoryValidationException.class)
-    public ResponseEntity<Map<String, String>> handleCategoryValidation(
+    public ResponseEntity<?> handleCategoryValidation(
             CategoryValidationException ex) {
 
-        return new ResponseEntity<>(
+        return CommonUtil.createErrorResponse(
                 ex.getErrors(),
                 HttpStatus.BAD_REQUEST
         );
     }
 
-   /* @ExceptionHandler(ExistDataException.class)
-    public ResponseEntity<Map<String, String>> existDataException(
+
+    // Existing Data Exception
+    @ExceptionHandler(ExistDataException.class)
+    public ResponseEntity<?> existDataException(
             ExistDataException ex) {
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of("message", ex.getMessage()));
-   */ //}
-
-    @ExceptionHandler(ExistDataException.class)
-    public ResponseEntity<Map<String, String>> existDataException(ExistDataException dataException) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of("message", dataException.getMessage()));
+        return CommonUtil.createErrorResponseMessage(
+                ex.getMessage(),
+                HttpStatus.CONFLICT
+        );
     }
 
+
+    // Invalid JSON / Request Body Exception
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> existDataException(HttpMessageNotReadableException dataException) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", dataException.getMessage()));
+    public ResponseEntity<?> handleMessageNotReadable(
+            HttpMessageNotReadableException ex) {
+
+        return CommonUtil.createErrorResponseMessage(
+                "Invalid request body",
+                HttpStatus.BAD_REQUEST
+        );
     }
 
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(
-            Exception ex) {
+    public ResponseEntity<?> handleException(Exception ex) {
 
-        ErrorResponse response = new ErrorResponse(
+        return CommonUtil.createErrorResponseMessage(
                 "Something went wrong",
-                "INTERNAL_SERVER_ERROR",
-                LocalDateTime.now()
-        );
-
-        return new ResponseEntity<>(
-                response,
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
-
     }
 }
-
