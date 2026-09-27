@@ -84,6 +84,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(NotesValidationException.class)
+    public ResponseEntity<?> handleNotesValidation(
+            NotesValidationException ex) {
+
+        return CommonUtil.createErrorResponse(
+                ex.getErrors(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
@@ -94,4 +104,5 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
+
 }

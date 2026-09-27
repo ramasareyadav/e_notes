@@ -100,7 +100,6 @@ public class CategoryServiceImpl implements CategoryService {
         validation.categoryValidation(categoryDto);
 
 
-
         Category category = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "category not found with id:" + categoryDto.getId()

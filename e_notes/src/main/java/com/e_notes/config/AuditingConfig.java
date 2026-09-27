@@ -13,7 +13,7 @@ public class AuditingConfig {
 
     @Bean
     public AuditorAware<Integer> auditorAware() {
-        return () -> Optional.of(1);
+        return () -> Optional.of(2);
     }
 }
 
