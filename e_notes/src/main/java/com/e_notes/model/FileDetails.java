@@ -11,18 +11,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Notes extends BaseModel {
+@Table(name = "file_details")
+public class FileDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String title;
-    private String description;
-    @ManyToOne
-    private Category category;
-   // private Integer userId;
-
-
-    @ManyToOne
-    //@JoinColumn(name = "file_details_id")
-    private FileDetails fileDetails;
+    private String uploadFileName;
+    private String originalFileName;
+    private String displayName;
+    private String path;
+    private Long fileSize;
 }
