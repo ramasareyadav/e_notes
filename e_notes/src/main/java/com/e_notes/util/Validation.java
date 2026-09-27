@@ -1,9 +1,10 @@
 package com.e_notes.util;
 
 import com.e_notes.dto.CategoryDto;
+import com.e_notes.dto.NotesDto;
 import com.e_notes.exception.CategoryValidationException;
+import com.e_notes.exception.NotesValidationException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,49 +16,59 @@ public class Validation {
 
         Map<String, String> errors = new LinkedHashMap<>();
 
-        // 1. Check CategoryDto
-        if (ObjectUtils.isEmpty(categoryDto)) {
-            throw new IllegalArgumentException(
-                    "Category object shouldn't be null or empty"
-            );
+        if (categoryDto == null) {
+            errors.put("category", "Category data is required");
+        } else {
+
+            if (categoryDto.getName() == null ||
+                    categoryDto.getName().trim().isEmpty()) {
+
+                errors.put("name", "Category name is required");
+            }
+
+            if (categoryDto.getDescription() == null ||
+                    categoryDto.getDescription().trim().isEmpty()) {
+
+                errors.put("description", "Category description is required");
+            }
         }
 
-        // 2. Validate name
-        if (ObjectUtils.isEmpty(categoryDto.getName())
-                || categoryDto.getName().trim().isEmpty()) {
-
-            errors.put(
-                    "name",
-                    "Name field is empty or null"
-            );
-        } else if (categoryDto.getName().length() > 50) {
-
-            errors.put(
-                    "name",
-                    "Name must not exceed 50 characters"
-            );
-        }
-
-        // 3. Validate description
-        if (ObjectUtils.isEmpty(categoryDto.getDescription())
-                || categoryDto.getDescription().trim().isEmpty()) {
-
-            errors.put(
-                    "description",
-                    "Description field is empty or null"
-            );
-        } else if (categoryDto.getDescription().length() > 50) {
-
-            errors.put(
-                    "description",
-                    "Description must not exceed 50 characters"
-            );
-        }
-
-        // 4. Throw exception if validation errors exist
         if (!errors.isEmpty()) {
             throw new CategoryValidationException(errors);
         }
     }
-}
 
+
+    public void notesValidation(NotesDto notesDto) {
+
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        if (notesDto == null) {
+
+            errors.put("notes", "Notes data is required");
+
+        } else {
+
+            if (notesDto.getTitle() == null ||
+                    notesDto.getTitle().trim().isEmpty()) {
+
+                errors.put("title", "Title is required");
+            }
+
+            if (notesDto.getDescription() == null ||
+                    notesDto.getDescription().trim().isEmpty()) {
+
+                errors.put("description", "Description is required");
+            }
+
+            if (notesDto.getCategory() == null) {
+
+                errors.put("category", "Category is required");
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new NotesValidationException(errors);
+        }
+    }
+}
