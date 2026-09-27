@@ -28,6 +28,8 @@ public class NotesDto {
 
     private CategoryDto category;
 
+    private FilesDto fileDetails;
+
     @NotNull(message = "Category is required")
     private Integer createdBy;
 
@@ -36,5 +38,16 @@ public class NotesDto {
     private Integer updatedBy;
 
     private LocalDateTime updatedOn;
+
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FilesDto{
+        private Integer id;
+        private String originalFileName;
+        private String displayName;
+    }
 
 }
