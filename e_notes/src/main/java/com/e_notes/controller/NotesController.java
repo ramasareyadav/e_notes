@@ -1,6 +1,7 @@
 package com.e_notes.controller;
 
 import com.e_notes.dto.NotesDto;
+import com.e_notes.dto.NotesResponse;
 import com.e_notes.model.FileDetails;
 import com.e_notes.service.NotesService;
 import com.e_notes.util.CommonUtil;
@@ -49,7 +50,6 @@ public class NotesController {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
-
     // ================= GET ALL NOTES =================
 
     @GetMapping("/allNotes")
@@ -145,5 +145,32 @@ public class NotesController {
 
         // Return file
         return ResponseEntity.ok().headers(httpHeaders).body(data);
+    }
+    @GetMapping("/pagination")
+    public ResponseEntity<?> getNotesWithPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        List<NotesDto> notes = notesService.getNotesWithPagination(page, size);
+
+        if (CollectionUtils.isEmpty(notes)) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return CommonUtil.createBuildResponse(
+                notes,
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/user-notes")
+    public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        Integer userId = 2;
+        NotesResponse notes = notesService.getAllNotesByUser(userId,pageNo,pageSize);
+//		if (CollectionUtils.isEmpty(notes)) {
+//			return ResponseEntity.noContent().build();
+//		}
+        return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
     }
 }

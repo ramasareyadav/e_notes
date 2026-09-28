@@ -1,6 +1,7 @@
 package com.e_notes.service;
 
 import com.e_notes.dto.NotesDto;
+import com.e_notes.dto.NotesResponse;
 import com.e_notes.model.FileDetails;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,9 @@ public interface NotesService {
     public byte[] downloadFile(FileDetails details) throws Exception;
 
     FileDetails getFileDetails(Integer id) throws Exception;
+
+    List<NotesDto> getNotesWithPagination(int page, int size);
+
+   // NotesResponse getAllNotesByUser(Integer userId);
+   public NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize);
 }

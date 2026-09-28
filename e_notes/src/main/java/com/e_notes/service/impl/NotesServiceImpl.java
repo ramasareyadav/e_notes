@@ -1,6 +1,7 @@
 package com.e_notes.service.impl;
 
 import com.e_notes.dto.NotesDto;
+import com.e_notes.dto.NotesResponse;
 import com.e_notes.exception.ResourceNotFoundException;
 import com.e_notes.model.Category;
 import com.e_notes.model.FileDetails;
@@ -13,6 +14,9 @@ import com.e_notes.util.Validation;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
@@ -29,6 +33,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class NotesServiceImpl implements NotesService {
@@ -407,17 +412,57 @@ public class NotesServiceImpl implements NotesService {
 
     @Override
     public byte[] downloadFile(FileDetails details) throws Exception {
-       // FileDetails fileDetails = fileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("file is not available "));
+        // FileDetails fileDetails = fileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("file is not available "));
 
         FileInputStream inputStream = new FileInputStream(details.getPath());
         return StreamUtils.copyToByteArray(inputStream);
     }
 
     @Override
-    public FileDetails getFileDetails(Integer id) throws Exception{
+    public FileDetails getFileDetails(Integer id) throws Exception {
 
         FileDetails fileDet = fileRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("file is not available "));
         return fileDet;
 
+    }
+
+    @Override
+    public List<NotesDto> getNotesWithPagination(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Notes> notesPage = notesRepository.findAll(pageable);
+
+        return notesPage.getContent()
+                .stream()
+                .map(notes ->
+                        modelMapper.map(notes, NotesDto.class))
+                .toList();
+    }
+    @Override
+    public NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize) {
+        {
+
+            Pageable pageable = PageRequest.of(0, 10);
+
+            Page<Notes> pageNotes =
+                    notesRepository.findByCreatedBy(userId, pageable);
+
+            List<NotesDto> notesDto =
+                    pageNotes.getContent()
+                            .stream()
+                            .map(n -> modelMapper.map(n, NotesDto.class))
+                            .toList();
+
+            return NotesResponse.builder()
+                    .notes(notesDto)
+                    .pageNo(pageNotes.getNumber())
+                    .pageSize(pageNotes.getSize())
+                    .totalElement(pageNotes.getTotalElements())
+                    .totalPages(pageNotes.getTotalPages())
+                    .isFirst(pageNotes.isFirst())
+                    .isLast(pageNotes.isLast())
+                    .build();
+        }
     }
 }
