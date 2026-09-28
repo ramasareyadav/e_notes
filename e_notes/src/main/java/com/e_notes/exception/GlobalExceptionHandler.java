@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -91,6 +92,15 @@ public class GlobalExceptionHandler {
         return CommonUtil.createErrorResponse(
                 ex.getErrors(),
                 HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<?> fileNotFoundException(
+            FileNotFoundException f) {
+
+        return CommonUtil.createErrorResponse(
+                f.getMessage(),
+                HttpStatus.NOT_FOUND
         );
     }
 
