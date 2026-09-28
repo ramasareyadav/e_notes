@@ -1,9 +1,11 @@
 package com.e_notes.controller;
 
 import com.e_notes.dto.NotesDto;
+import com.e_notes.model.FileDetails;
 import com.e_notes.service.NotesService;
 import com.e_notes.util.CommonUtil;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -119,5 +121,29 @@ public class NotesController {
                 "Notes not deleted",
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Integer id) throws Exception {
+
+        // Get file details from database
+        FileDetails fileDetails = notesService.getFileDetails(id);
+
+        // Read file from storage
+        byte[] data = notesService.downloadFile(fileDetails);
+
+        // Create headers
+        HttpHeaders httpHeaders = new HttpHeaders();
+
+        // Set content type
+        MediaType contentType = CommonUtil.getContentType(fileDetails.getOriginalFileName());
+
+        httpHeaders.setContentType(contentType);
+
+        // Download file instead of opening it
+        httpHeaders.setContentDispositionFormData("attachment", fileDetails.getOriginalFileName());
+
+        // Return file
+        return ResponseEntity.ok().headers(httpHeaders).body(data);
     }
 }
