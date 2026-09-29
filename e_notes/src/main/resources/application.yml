@@ -22,6 +22,19 @@ spring:
       max-file-size: 5MB
       max-request-size: 6MB
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ramasareyadav2011@gmail.com
+    password: jivb hkob dxwz rnve
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: 8081
 
@@ -30,6 +43,7 @@ file:
     path: notes/
     min-size: 10KB
     max-size: 5MB
+
 notes:
   recycle-bin:
-    retention-days=30:
+    retention-days: 30
