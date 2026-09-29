@@ -114,6 +114,25 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(UserValidationException.class)
+    public ResponseEntity<?> handleUserValidationException(
+            UserValidationException ex) {
+
+        return CommonUtil.createErrorResponse(
+                ex.getErrors(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(
+            IllegalArgumentException ex) {
+
+        return CommonUtil.createErrorResponseMessage(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
