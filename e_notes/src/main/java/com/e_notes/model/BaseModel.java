@@ -36,5 +36,8 @@ public abstract class BaseModel {
     private Boolean isDeleted;
 
     private LocalDateTime deletedOn;
+
+    @Column(name = "is_favourite")
+    private Boolean isFavourite = false;
 }
 

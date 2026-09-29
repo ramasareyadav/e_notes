@@ -210,4 +210,43 @@ public class NotesController {
                 HttpStatus.OK
         );
     }
+
+    @PutMapping("/favourite/{id}")
+    public ResponseEntity<?> addToFavourite(
+            @PathVariable Integer id) throws Exception {
+
+        notesService.addToFavourite(id);
+
+        return CommonUtil.createBuildResponseMessage(
+                "Notes added to favourite",
+                HttpStatus.OK
+        );
+    }
+
+    @PutMapping("/remove-favourite/{id}")
+    public ResponseEntity<?> removeFromFavourite(
+            @PathVariable Integer id) throws Exception {
+
+        notesService.removeFromFavourite(id);
+
+        return CommonUtil.createBuildResponseMessage(
+                "Notes removed from favourite",
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/favourite")
+    public ResponseEntity<?> getFavouriteNotes()
+            throws Exception {
+
+        Integer userId = 2;
+
+        List<NotesDto> notes =
+                notesService.getFavouriteNotes(userId);
+
+        return CommonUtil.createBuildResponse(
+                notes,
+                HttpStatus.OK
+        );
+    }
 }

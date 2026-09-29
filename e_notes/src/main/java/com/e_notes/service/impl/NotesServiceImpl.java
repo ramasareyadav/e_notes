@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -526,5 +527,54 @@ public class NotesServiceImpl implements NotesService {
                 );
 
         notesRepository.delete(notes);
+    }
+
+    @Override
+    public void addToFavourite(Integer id) throws Exception {
+        Notes notes = notesRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + id
+                        )
+                );
+
+        if (Boolean.TRUE.equals(notes.getIsDeleted())) {
+            throw new Exception("Deleted notes cannot be added to favourite");
+        }
+
+        notes.setIsFavourite(true);
+
+        notesRepository.save(notes);
+    }
+
+    @Override
+    public void removeFromFavourite(Integer id) throws Exception {
+
+        Notes notes = notesRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + id
+                        )
+                );
+
+        notes.setIsFavourite(false);
+
+        notesRepository.save(notes);
+
+    }
+
+    @Override
+    public List<NotesDto> getFavouriteNotes(Integer userId) throws Exception {
+        List<Notes> notes =
+                notesRepository
+                        .findByCreatedByAndIsFavouriteTrueAndIsDeletedFalse(
+                                userId
+                        );
+
+        return notes.stream()
+                .map(note -> modelMapper.map(note, NotesDto.class))
+                .collect(Collectors.toList());
     }
 }
