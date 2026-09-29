@@ -104,6 +104,16 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(TodoValidationException.class)
+    public ResponseEntity<?> handleTodoValidation(
+            TodoValidationException ex) {
+
+        return CommonUtil.createErrorResponse(
+                ex.getErrors(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
 
     // Generic Exception
     @ExceptionHandler(Exception.class)
