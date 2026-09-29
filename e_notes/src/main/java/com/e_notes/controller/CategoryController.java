@@ -74,4 +74,6 @@ public class CategoryController {
         categoryService.updateCategory(categoryDto);
         return ResponseEntity.ok("Category updated successfully");
     }
+
+
 }

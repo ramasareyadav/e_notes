@@ -35,4 +35,10 @@ public interface NotesService {
     public List<NotesDto> getUserRecycleBinNotes(Integer userId);
 
     void hardDeleteNotes(Integer id) throws Exception;
+
+    void addToFavourite(Integer id) throws Exception;
+
+    void removeFromFavourite(Integer id) throws Exception;
+
+    List<NotesDto> getFavouriteNotes(Integer userId) throws Exception;
 }

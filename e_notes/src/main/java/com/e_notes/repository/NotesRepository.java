@@ -17,4 +17,6 @@ public interface NotesRepository extends JpaRepository<Notes, Integer> {
     List<Notes> findByCreatedByAndIsDeletedTrue(Integer userId);
 
     List<Notes> findByIsDeletedTrueAndDeletedOnBefore(LocalDateTime expiryDate);
+
+    List<Notes> findByCreatedByAndIsFavouriteTrueAndIsDeletedFalse(Integer userId);
 }
