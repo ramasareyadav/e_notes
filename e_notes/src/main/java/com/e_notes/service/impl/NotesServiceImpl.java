@@ -1,12 +1,15 @@
 package com.e_notes.service.impl;
 
+import com.e_notes.dto.FavouriteNoteDto;
 import com.e_notes.dto.NotesDto;
 import com.e_notes.dto.NotesResponse;
 import com.e_notes.exception.ResourceNotFoundException;
 import com.e_notes.model.Category;
+import com.e_notes.model.FavouriteNotes;
 import com.e_notes.model.FileDetails;
 import com.e_notes.model.Notes;
 import com.e_notes.repository.CategoryRepository;
+import com.e_notes.repository.FavouriteNotesRepository;
 import com.e_notes.repository.FileRepository;
 import com.e_notes.repository.NotesRepository;
 import com.e_notes.service.NotesService;
@@ -32,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +50,7 @@ public class NotesServiceImpl implements NotesService {
     private final ObjectMapper objectMapper;
 
     private final FileRepository fileRepository;
+    private final FavouriteNotesRepository favouriteNotesRepository;
 
     @Value("${file.upload.path}")
     private String uploadPath;
@@ -55,7 +60,7 @@ public class NotesServiceImpl implements NotesService {
             ModelMapper modelMapper,
             Validation validation,
             CategoryRepository categoryRepository,
-            ObjectMapper objectMapper, FileRepository fileRepository) {
+            ObjectMapper objectMapper, FileRepository fileRepository, FavouriteNotesRepository favouriteNotesRepository) {
 
         this.notesRepository = notesRepository;
         this.modelMapper = modelMapper;
@@ -63,6 +68,7 @@ public class NotesServiceImpl implements NotesService {
         this.categoryRepository = categoryRepository;
         this.objectMapper = objectMapper;
         this.fileRepository = fileRepository;
+        this.favouriteNotesRepository = favouriteNotesRepository;
     }
 
     // ================= SAVE NOTES =================
@@ -488,7 +494,7 @@ public class NotesServiceImpl implements NotesService {
     }
 
     @Override
-    public void restoreNotes(Integer id) throws Exception{
+    public void restoreNotes(Integer id) throws Exception {
 
         Notes notes = notesRepository
                 .findById(id)
@@ -509,7 +515,7 @@ public class NotesServiceImpl implements NotesService {
 
     @Override
     public List<NotesDto> getUserRecycleBinNotes(Integer userId) {
-        List<Notes> recycleNotes= notesRepository.findByCreatedByAndIsDeletedTrue(userId);
+        List<Notes> recycleNotes = notesRepository.findByCreatedByAndIsDeletedTrue(userId);
         List<NotesDto> notesDtos = recycleNotes.stream().map(notes ->
                 modelMapper
                         .map(notes, NotesDto.class)).toList();
@@ -530,6 +536,69 @@ public class NotesServiceImpl implements NotesService {
     }
 
     @Override
+    public void favouriteNotes(Integer noteId) throws Exception {
+        int userId = 2;
+        Notes notes = notesRepository.findById(noteId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + noteId
+                        )
+                );
+        FavouriteNotes favouriteNotes = FavouriteNotes.builder()
+                .note(notes)
+                .userId(userId)
+                .build();
+        favouriteNotesRepository.save(favouriteNotes);
+
+        if (Boolean.TRUE.equals(notes.getIsDeleted())) {
+            throw new Exception("Deleted notes cannot be added to favourite");
+        }
+
+        notes.setIsFavourite(true);
+
+        notesRepository.save(notes);
+    }
+
+    @Override
+    public void unFavouriteNotes(Integer favouriteNoteId) throws Exception {
+        FavouriteNotes favouriteNotes = favouriteNotesRepository
+                .findById(favouriteNoteId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + favouriteNoteId
+                        )
+                );
+        favouriteNotesRepository.delete(favouriteNotes);
+    }
+
+    @Override
+    public List<FavouriteNoteDto> getFavouriteNotes() throws Exception {
+        int userId=2;
+        Optional<FavouriteNotes> favouriteNotes =
+                favouriteNotesRepository.findById(userId);
+
+        return favouriteNotes.stream()
+                .map(favourite -> {
+
+                    FavouriteNoteDto dto =
+                            modelMapper.map(
+                                    favourite,
+                                    FavouriteNoteDto.class
+                            );
+
+                    dto.setNotes(
+                            modelMapper.map(
+                                    favourite.getNote(),
+                                    NotesDto.class
+                            )
+                    );
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /*@Override
     public void addToFavourite(Integer id) throws Exception {
         Notes notes = notesRepository
                 .findById(id)
@@ -576,5 +645,5 @@ public class NotesServiceImpl implements NotesService {
         return notes.stream()
                 .map(note -> modelMapper.map(note, NotesDto.class))
                 .collect(Collectors.toList());
-    }
+    }*/
 }

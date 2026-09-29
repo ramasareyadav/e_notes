@@ -43,7 +43,7 @@ public class NotesDto {
 
     private LocalDateTime deletedOn;
 
-    private Boolean isFavourite;
+    //private Boolean isFavourite;
 
 
     @Getter

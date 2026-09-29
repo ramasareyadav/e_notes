@@ -1,5 +1,6 @@
 package com.e_notes.service;
 
+import com.e_notes.dto.FavouriteNoteDto;
 import com.e_notes.dto.NotesDto;
 import com.e_notes.dto.NotesResponse;
 import com.e_notes.model.FileDetails;
@@ -36,9 +37,15 @@ public interface NotesService {
 
     void hardDeleteNotes(Integer id) throws Exception;
 
-    void addToFavourite(Integer id) throws Exception;
+    public void favouriteNotes(Integer noteId)throws Exception;
+
+    public void unFavouriteNotes(Integer noteId)throws Exception;
+
+    List<FavouriteNoteDto> getFavouriteNotes() throws Exception;
+
+   /* void addToFavourite(Integer id) throws Exception;
 
     void removeFromFavourite(Integer id) throws Exception;
 
-    List<NotesDto> getFavouriteNotes(Integer userId) throws Exception;
+   */// List<NotesDto> getFavouriteNotes(Integer userId) throws Exception;
 }

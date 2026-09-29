@@ -1,5 +1,6 @@
 package com.e_notes.controller;
 
+import com.e_notes.dto.FavouriteNoteDto;
 import com.e_notes.dto.NotesDto;
 import com.e_notes.dto.NotesResponse;
 import com.e_notes.model.FileDetails;
@@ -211,42 +212,60 @@ public class NotesController {
         );
     }
 
-    @PutMapping("/favourite/{id}")
-    public ResponseEntity<?> addToFavourite(
-            @PathVariable Integer id) throws Exception {
+    /* @PutMapping("/favourite/{id}")
+     public ResponseEntity<?> addToFavourite(
+             @PathVariable Integer id) throws Exception {
 
-        notesService.addToFavourite(id);
+         notesService.addToFavourite(id);
 
-        return CommonUtil.createBuildResponseMessage(
-                "Notes added to favourite",
-                HttpStatus.OK
-        );
+         return CommonUtil.createBuildResponseMessage(
+                 "Notes added to favourite",
+                 HttpStatus.OK
+         );
+     }
+
+     @PutMapping("/remove-favourite/{id}")
+     public ResponseEntity<?> removeFromFavourite(
+             @PathVariable Integer id) throws Exception {
+
+         notesService.removeFromFavourite(id);
+
+         return CommonUtil.createBuildResponseMessage(
+                 "Notes removed from favourite",
+                 HttpStatus.OK
+         );
+     }
+
+     @GetMapping("/favourite")
+     public ResponseEntity<?> getFavouriteNotes()
+             throws Exception {
+
+         Integer userId = 2;
+
+         List<NotesDto> notes =
+                 notesService.getFavouriteNotes(userId);
+
+         return CommonUtil.createBuildResponse(
+                 notes,
+                 HttpStatus.OK
+         );
+     }*/
+    @PostMapping("/favourite/{noteId}")
+    public ResponseEntity<?> favouriteNotes(@PathVariable Integer noteId) throws Exception {
+        notesService.favouriteNotes(noteId);
+        return CommonUtil.createBuildResponseMessage("Notes added to favourite", HttpStatus.OK);
+    } // Remove Notes from Favourite
+
+    @DeleteMapping("/unfavourite/{favouriteNoteId}")
+    public ResponseEntity<?> unFavouriteNotes(@PathVariable Integer favouriteNoteId) throws Exception {
+        notesService.unFavouriteNotes(favouriteNoteId);
+        return CommonUtil.createBuildResponseMessage("Notes removed from favourite", HttpStatus.OK);
     }
 
-    @PutMapping("/remove-favourite/{id}")
-    public ResponseEntity<?> removeFromFavourite(
-            @PathVariable Integer id) throws Exception {
-
-        notesService.removeFromFavourite(id);
-
-        return CommonUtil.createBuildResponseMessage(
-                "Notes removed from favourite",
-                HttpStatus.OK
-        );
-    }
-
+    // Get Favourite Notes
     @GetMapping("/favourite")
-    public ResponseEntity<?> getFavouriteNotes()
-            throws Exception {
-
-        Integer userId = 2;
-
-        List<NotesDto> notes =
-                notesService.getFavouriteNotes(userId);
-
-        return CommonUtil.createBuildResponse(
-                notes,
-                HttpStatus.OK
-        );
+    public ResponseEntity<?> getFavouriteNotes() throws Exception {
+        List<FavouriteNoteDto> favouriteNotes = notesService.getFavouriteNotes();
+        return CommonUtil.createBuildResponse(favouriteNotes, HttpStatus.OK);
     }
 }
