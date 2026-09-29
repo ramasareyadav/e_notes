@@ -268,4 +268,17 @@ public class NotesController {
         List<FavouriteNoteDto> favouriteNotes = notesService.getFavouriteNotes();
         return CommonUtil.createBuildResponse(favouriteNotes, HttpStatus.OK);
     }
+
+    @PostMapping("/copy/{noteId}")
+    public ResponseEntity<?> copyNotes(
+            @PathVariable Integer noteId) throws Exception {
+
+        NotesDto copiedNotes =
+                notesService.copyNotes(noteId);
+
+        return CommonUtil.createBuildResponse(
+                copiedNotes,
+                HttpStatus.OK
+        );
+    }
 }

@@ -43,6 +43,8 @@ public interface NotesService {
 
     List<FavouriteNoteDto> getFavouriteNotes() throws Exception;
 
+    NotesDto copyNotes(Integer noteId) throws Exception;
+
    /* void addToFavourite(Integer id) throws Exception;
 
     void removeFromFavourite(Integer id) throws Exception;

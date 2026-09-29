@@ -598,6 +598,53 @@ public class NotesServiceImpl implements NotesService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public NotesDto copyNotes(Integer noteId) throws Exception {
+        // Find original note
+        Notes originalNotes = notesRepository
+                .findById(noteId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + noteId
+                        )
+                );
+
+        // Do not copy deleted note
+        if (Boolean.TRUE.equals(originalNotes.getIsDeleted())) {
+            throw new Exception(
+                    "Deleted notes cannot be copied"
+            );
+        }
+
+        // Create new note
+        Notes copiedNotes = new Notes();
+
+        copiedNotes.setTitle(originalNotes.getTitle());
+        copiedNotes.setDescription(originalNotes.getDescription());
+        copiedNotes.setCategory(originalNotes.getCategory());
+
+        // New note belongs to the same user
+        copiedNotes.setCreatedBy(originalNotes.getCreatedBy());
+
+        copiedNotes.setCreatedOn(LocalDateTime.now());
+
+        copiedNotes.setIsDeleted(false);
+        copiedNotes.setDeletedOn(null);
+
+        copiedNotes.setIsFavourite(false);
+
+        // Save as a NEW record
+        Notes savedNotes =
+                notesRepository.save(copiedNotes);
+
+        // Convert Entity → DTO
+        return modelMapper.map(
+                savedNotes,
+                NotesDto.class
+        );
+
+    }
+
     /*@Override
     public void addToFavourite(Integer id) throws Exception {
         Notes notes = notesRepository
