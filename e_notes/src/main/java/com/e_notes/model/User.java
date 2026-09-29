@@ -36,10 +36,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-//    @Builder.Default
-//    @Column(nullable = false)
-//    private Boolean isActive = true;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
@@ -48,4 +44,8 @@ public class User {
     )
     @Builder.Default
     private List<Role> roles = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name = "status_id")
+    private AccountStatus status;
 }
