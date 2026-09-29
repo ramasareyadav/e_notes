@@ -3,7 +3,9 @@ package com.e_notes.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,9 +36,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean isActive = true;
+//    @Builder.Default
+//    @Column(nullable = false)
+//    private Boolean isActive = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -45,5 +47,5 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
-    private Set<Role> roles = new HashSet<>();
+    private List<Role> roles = new ArrayList<>();
 }

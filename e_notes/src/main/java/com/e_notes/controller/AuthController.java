@@ -21,13 +21,23 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserDto userDto) throws Exception {
+
         Boolean register = userService.register(userDto);
-        if (register) {
-            return CommonUtil.createBuildResponseMessage("Register success", HttpStatus.CREATED);
+
+        if (Boolean.TRUE.equals(register)) {
+
+            return CommonUtil.createBuildResponseMessage(
+                    "Account registered successfully",
+                    HttpStatus.CREATED
+            );
         }
-        return CommonUtil.createErrorResponseMessage("Register failed", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return CommonUtil.createErrorResponseMessage(
+                "Account registration failed",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 
 }

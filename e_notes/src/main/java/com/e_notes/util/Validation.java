@@ -5,10 +5,12 @@ import com.e_notes.dto.NotesDto;
 import com.e_notes.dto.TodoDto;
 import com.e_notes.dto.UserDto;
 import com.e_notes.exception.CategoryValidationException;
+import com.e_notes.exception.ExistDataException;
 import com.e_notes.exception.NotesValidationException;
 import com.e_notes.exception.TodoValidationException;
 import com.e_notes.model.Role;
 import com.e_notes.repository.RoleRepository;
+import com.e_notes.repository.UserRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -22,8 +24,11 @@ public class Validation {
 
     private final RoleRepository roleRepository;
 
-    public Validation(RoleRepository roleRepository) {
+    private final UserRepository userRepository;
+
+    public Validation(RoleRepository roleRepository, UserRepository userRepository) {
         this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
     }
 
     // =========================
@@ -177,6 +182,11 @@ public class Validation {
             throw new IllegalArgumentException(
                     "Email is invalid"
             );
+        } else {
+            Boolean existEmail = userRepository.existsByEmail(userDto.getEmail());
+            if (existEmail) {
+                throw new ExistDataException("Email already exist");
+            }
         }
 
 
