@@ -30,3 +30,6 @@ file:
     path: notes/
     min-size: 10KB
     max-size: 5MB
+notes:
+  recycle-bin:
+    retention-days=30:

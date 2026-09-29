@@ -104,24 +104,23 @@ public class NotesController {
 
     // ================= DELETE NOTES =================
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNotes(
-            @PathVariable Integer id) {
-
-        Boolean deleted = notesService.deleteNotes(id);
-
-        if (deleted) {
-            return CommonUtil.createBuildResponse(
-                    "Notes deleted successfully",
-                    HttpStatus.OK
-            );
-        }
-
-        return CommonUtil.createErrorResponseMessage(
-                "Notes not deleted",
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteNotes(@PathVariable Integer id) {
+//
+//        Boolean deleted = notesService.deleteNotes(id);
+//
+//        if (deleted) {
+//            return CommonUtil.createBuildResponse(
+//                    "Notes deleted successfully",
+//                    HttpStatus.OK
+//            );
+//        }
+//
+//        return CommonUtil.createErrorResponseMessage(
+//                "Notes not deleted",
+//                HttpStatus.INTERNAL_SERVER_ERROR
+//        );
+//    }
 
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable Integer id) throws Exception {
@@ -146,6 +145,7 @@ public class NotesController {
         // Return file
         return ResponseEntity.ok().headers(httpHeaders).body(data);
     }
+
     @GetMapping("/pagination")
     public ResponseEntity<?> getNotesWithPagination(
             @RequestParam(defaultValue = "0") int page,
@@ -167,10 +167,47 @@ public class NotesController {
     public ResponseEntity<?> getAllNotesByUser(@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         Integer userId = 2;
-        NotesResponse notes = notesService.getAllNotesByUser(userId,pageNo,pageSize);
+        NotesResponse notes = notesService.getAllNotesByUser(userId, pageNo, pageSize);
 //		if (CollectionUtils.isEmpty(notes)) {
 //			return ResponseEntity.noContent().build();
 //		}
         return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleted-notes/{id}")
+    public ResponseEntity<?> deleteNotes(@PathVariable Integer id) throws Exception {
+        notesService.softDeleteNotes(id);
+        return CommonUtil.createBuildResponseMessage("Delete Success", HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/restore/{id}")
+    public ResponseEntity<?> restoreNotes(@PathVariable Integer id) throws Exception {
+        notesService.restoreNotes(id);
+        return CommonUtil.createBuildResponseMessage("Notes Restore Success", HttpStatus.OK);
+
+    }
+
+    @GetMapping("/recycle-bin")
+    public ResponseEntity<?> getUserRecycleBinNotes() throws Exception {
+        Integer userId = 2;
+        List<NotesDto> notes = notesService.getUserRecycleBinNotes(userId);
+        if (CollectionUtils.isEmpty(notes)) {
+            return CommonUtil.createBuildResponseMessage("Notes not available in Recycle Bin", HttpStatus.OK);
+        }
+        return CommonUtil.createBuildResponse(notes, HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> hardDeleteNotes(
+            @PathVariable Integer id) throws Exception {
+
+        notesService.hardDeleteNotes(id);
+
+        return CommonUtil.createBuildResponseMessage(
+                "Notes permanently deleted",
+                HttpStatus.OK
+        );
     }
 }

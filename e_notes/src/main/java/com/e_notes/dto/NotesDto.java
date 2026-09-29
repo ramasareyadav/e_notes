@@ -39,6 +39,10 @@ public class NotesDto {
 
     private LocalDateTime updatedOn;
 
+    private Boolean isDeleted;
+
+    private LocalDateTime deletedOn;
+
 
     @Getter
     @Setter
