@@ -1,9 +1,11 @@
 package com.e_notes.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.e_notes.dto.EmailRequest;
 import com.e_notes.dto.UserDto;
+import com.e_notes.model.AccountStatus;
 import com.e_notes.model.Role;
 import com.e_notes.model.User;
 import com.e_notes.repository.RoleRepository;
@@ -41,6 +43,12 @@ public class UserServiceImpl implements UserService {
         User user = mapper.map(userDto, User.class);
 
         setRole(userDto, user);
+
+        AccountStatus status=AccountStatus.builder()
+                .isActive(false)
+                .varificationCode(UUID.randomUUID().toString())
+                .build();
+        user.setStatus(status);
 
         User saveUser = userRepo.save(user);
         if (!ObjectUtils.isEmpty(saveUser)) {
