@@ -439,6 +439,7 @@ public class NotesServiceImpl implements NotesService {
                         modelMapper.map(notes, NotesDto.class))
                 .toList();
     }
+
     @Override
     public NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize) {
         {
@@ -464,5 +465,66 @@ public class NotesServiceImpl implements NotesService {
                     .isLast(pageNotes.isLast())
                     .build();
         }
+    }
+
+    @Override
+    public void softDeleteNotes(Integer id) throws Exception {
+
+        Notes notes = notesRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + id
+                        )
+                );
+
+        // Soft delete
+        notes.setIsDeleted(true);
+        notes.setDeletedOn(LocalDateTime.now());
+
+        // Save changes instead of physically deleting
+        notesRepository.save(notes);
+    }
+
+    @Override
+    public void restoreNotes(Integer id) throws Exception{
+
+        Notes notes = notesRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + id
+                        )
+                );
+
+        // Soft delete
+        notes.setIsDeleted(false);
+        notes.setDeletedOn(null);
+
+        // Save changes instead of physically deleting
+        notesRepository.save(notes);
+
+    }
+
+    @Override
+    public List<NotesDto> getUserRecycleBinNotes(Integer userId) {
+        List<Notes> recycleNotes= notesRepository.findByCreatedByAndIsDeletedTrue(userId);
+        List<NotesDto> notesDtos = recycleNotes.stream().map(notes ->
+                modelMapper
+                        .map(notes, NotesDto.class)).toList();
+        return notesDtos;
+    }
+
+    @Override
+    public void hardDeleteNotes(Integer id) throws Exception {
+        Notes notes = notesRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notes not found with id: " + id
+                        )
+                );
+
+        notesRepository.delete(notes);
     }
 }

@@ -27,4 +27,12 @@ public interface NotesService {
 
    // NotesResponse getAllNotesByUser(Integer userId);
    public NotesResponse getAllNotesByUser(Integer userId, Integer pageNo, Integer pageSize);
+
+   public void softDeleteNotes(Integer id) throws Exception;
+
+   public void restoreNotes(Integer id) throws Exception;
+
+    public List<NotesDto> getUserRecycleBinNotes(Integer userId);
+
+    void hardDeleteNotes(Integer id) throws Exception;
 }

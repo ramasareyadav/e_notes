@@ -32,5 +32,9 @@ public abstract class BaseModel {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime updatedOn;
+
+    private Boolean isDeleted;
+
+    private LocalDateTime deletedOn;
 }
 
