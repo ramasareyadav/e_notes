@@ -2,50 +2,77 @@ package com.e_notes.service.impl;
 
 import com.e_notes.model.User;
 import com.e_notes.service.JwtService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    private String secretKey="";
+    private String secretKey = "";
 
     public JwtServiceImpl() {
         try {
-       KeyGenerator keyGen  = KeyGenerator.getInstance("HmacSHA256");
-            SecretKey sk= keyGen.generateKey();
+            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
+            SecretKey sk = keyGen.generateKey();
             secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
         } catch (Exception e) {
-              e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
     @Override
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        
+
         claims.put("id", user.getId());
         claims.put("role", user.getRoles());
         claims.put("status", user.getStatus().getIsActive());
 
-      String token= Jwts.builder()
+        String token = Jwts.builder()
                 .claims().add(null)
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()+60*60*10))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 10))
                 .and()
                 .signWith(getKey())
 
                 .compact();
-      return token;
+        return token;
+    }
+
+    @Override
+    public String extractUsername(String token) {
+        Claims claims = extractAllClaim(token);
+        claims.getSubject();
+    }
+
+    private Claims extractAllClaim(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(decryptKey(secretKey))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims;
+    }
+
+    private SecretKey decryptKey(String secretKey) {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+
+    }
+
+    @Override
+    public boolean validateToken(String token, UserDetails userDetails) {
+        return false;
     }
 
     private Key getKey() {
