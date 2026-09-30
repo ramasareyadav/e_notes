@@ -3,6 +3,8 @@ package com.e_notes.controller;
 import com.e_notes.dto.UserDto;
 import com.e_notes.service.UserService;
 import com.e_notes.util.CommonUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,33 +13,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDto userDto) throws Exception {
-
-        Boolean register = userService.register(userDto);
-
-        if (Boolean.TRUE.equals(register)) {
-
-            return CommonUtil.createBuildResponseMessage(
-                    "Account registered successfully",
-                    HttpStatus.CREATED
-            );
+    @PostMapping("/")
+    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto, HttpServletRequest request) throws Exception {
+        String url=CommonUtil.getUrl(request);
+        Boolean register = userService.register(userDto,url);
+        if (register) {
+            return CommonUtil.createBuildResponseMessage("Register success", HttpStatus.CREATED);
         }
-
-        return CommonUtil.createErrorResponseMessage(
-                "Account registration failed",
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        return CommonUtil.createErrorResponseMessage("Register failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
