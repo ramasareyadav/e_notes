@@ -6,6 +6,7 @@ import com.e_notes.model.*;
 import com.e_notes.repository.RoleRepository;
 import com.e_notes.repository.UserRepository;
 import com.e_notes.security.CustomUserDetails;
+import com.e_notes.service.JwtService;
 import com.e_notes.service.UserService;
 import com.e_notes.util.Validation;
 import org.modelmapper.ModelMapper;
@@ -45,6 +46,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
 
     @Override
@@ -153,8 +157,7 @@ public class UserServiceImpl implements UserService {
         CustomUserDetails customUserDetails =
                 (CustomUserDetails) authenticate.getPrincipal();
 
-        String token =
-                "safdghhfdssaghnggsdsgfvswaef";
+        String token = jwtService.generateToken(customUserDetails.getUser());
 
         return LoginResponse.builder()
                 .user(
