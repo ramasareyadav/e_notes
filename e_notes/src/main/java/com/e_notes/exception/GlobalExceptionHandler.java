@@ -25,6 +25,16 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+    @ExceptionHandler(SuccessException.class)
+    public ResponseEntity<?> successException(
+            SuccessException ex) {
+
+        return CommonUtil.createBuildResponse(
+                ex.getMessage(),
+                HttpStatus.OK
+        );
+    }
+
 
 
     // Bean Validation Exception
