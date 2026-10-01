@@ -31,54 +31,71 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(User user) {
-        Map<String, Object> claims = new HashMap<>();
 
+        Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("role", user.getRoles());
         claims.put("status", user.getStatus().getIsActive());
 
-        String token = Jwts.builder()
-                .claims().add(null)
+        String token = Jwts.builder().claims().add(claims)
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + 60 * 60 *60* 10))
                 .and()
                 .signWith(getKey())
-
                 .compact();
+
         return token;
+    }
+
+    private Key getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     @Override
     public String extractUsername(String token) {
-        Claims claims = extractAllClaim(token);
-        claims.getSubject();
+        Claims claims = extractAllClaims(token);
+        return claims.getSubject();
     }
 
-    private Claims extractAllClaim(String token) {
+    public String role(String token)
+    {
+        Claims claims = extractAllClaims(token);
+        String role=(String)claims.get("role");
+        return role;
+    }
+
+
+    private Claims extractAllClaims(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(decryptKey(secretKey))
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .verifyWith(decrytKey(secretKey))
+                .build().parseSignedClaims(token).getPayload();
         return claims;
     }
 
-    private SecretKey decryptKey(String secretKey) {
+    private SecretKey decrytKey(String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
-
     }
 
     @Override
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, UserDetails userDetails) {
+
+        String username = extractUsername(token);
+        Boolean isExpired=isTokenExpired(token);
+        if(username.equalsIgnoreCase(userDetails.getUsername()) && !isExpired)
+        {
+            return true;
+        }
         return false;
     }
 
-    private Key getKey() {
-
-        byte[] keyByte = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyByte);
-
+    private Boolean isTokenExpired(String token) {
+        Claims claims = extractAllClaims(token);
+        Date expiredDate = claims.getExpiration();
+        // 10th dec - today - expir- 11th dec
+        return expiredDate.before(new Date());
     }
+
 }
